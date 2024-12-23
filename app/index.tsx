@@ -1,5 +1,6 @@
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import React from "react";
 
 export default function Home() {
   const router = useRouter();
@@ -7,9 +8,27 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Gallery App</Text>
-      <Button title="Take a Photo" onPress={() => router.push("/camera")} />
-      <Button title="View Gallery" onPress={() => router.push("/gallery")} />
-      <Button title="View Map" onPress={() => router.push("/map")} />
+
+      <Pressable
+        style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+        onPress={() => router.replace("/camera")}
+      >
+        <Text style={styles.buttonText}>Take a Photo</Text>
+      </Pressable>
+
+      <Pressable
+        style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+        onPress={() => router.push("/gallery")}
+      >
+        <Text style={styles.buttonText}>View Gallery</Text>
+      </Pressable>
+
+      <Pressable
+        style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+        onPress={() => router.push("/map")}
+      >
+        <Text style={styles.buttonText}>View Map</Text>
+      </Pressable>
     </View>
   );
 }
@@ -25,5 +44,21 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+  },
+  button: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginVertical: 8,
+  },
+  buttonPressed: {
+    backgroundColor: "#0056b3",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });

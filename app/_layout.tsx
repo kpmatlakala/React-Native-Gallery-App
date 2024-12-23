@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Slot, Stack } from "expo-router";
 import CameraScreen from "./camera";
 import Home from "./index";
 import Gallery from "./gallery";
@@ -7,6 +7,8 @@ import React from "react";
 
 const Layout = () => {
   return (
+    // <Stack/>
+    // <Slot />
     <Stack
       screenOptions={{
         headerShown: true, // Customize headers as needed
@@ -17,11 +19,10 @@ const Layout = () => {
       />
       <Stack.Screen
         name="camera"       
-        options={{ title: "Camera" }}  
+        options={{ title: "Camera", headerBackVisible: true }}  
       />
       <Stack.Screen
-        name="gallery"
-        
+        name="gallery"        
         options={{ title: "Gallery" }}
       />
       <Stack.Screen
