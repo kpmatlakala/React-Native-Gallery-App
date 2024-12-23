@@ -1,0 +1,2 @@
+npm install -g expo-cli
+npx expo install expo-sqlite expo-location react-native-maps expo-camera
