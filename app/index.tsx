@@ -1,15 +1,18 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
+import GalleryScreen from "./gallery";
 
 export default function Home() {
   const router = useRouter();
+  const [cameraOpen, setCameraOpen] = useState(false);
+
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Gallery App</Text>
+      <GalleryScreen />
 
-      <Pressable
+      {/* <Pressable
         style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
         onPress={() => router.replace("/camera")}
       >
@@ -28,7 +31,7 @@ export default function Home() {
         onPress={() => router.push("/map")}
       >
         <Text style={styles.buttonText}>View Map</Text>
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 }

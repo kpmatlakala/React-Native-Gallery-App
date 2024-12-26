@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, Image, Pressable, Alert } from "react-native";
 import { fetchAllImages, deleteImageById } from "@/database/database";
+import Icons from "@/utils/Icons";
 
 const GalleryScreen = () => {
   const [images, setImages] = useState([]);
 
   const loadImages = async () => {
-    try {
-      const fetchedImages = await fetchAllImages();
-      
+    try 
+    {
+      const fetchedImages = await fetchAllImages();      
       setImages(fetchedImages);
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       console.error("Error fetching images:", error);
       Alert.alert("Error", "Failed to load gallery images.");
     }
@@ -33,7 +36,7 @@ const GalleryScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Gallery</Text>
+      <Text style={styles.title}>Gallery App</Text>
       {images.length === 0 ? (
         <Text style={styles.message}>No photos available.</Text>
       ) : (
@@ -42,12 +45,13 @@ const GalleryScreen = () => {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.imageContainer}>
-              <Image source={{ uri: item.uri }} style={styles.image} />
+              <Image source={{ uri: item.uri }} style={styles.previewImage} />
               <Text style={styles.metadata}>
                 Latitude: {item.latitude}, Longitude: {item.longitude}
               </Text>
               <Pressable style={styles.deleteButton} onPress={() => deleteImage(item.id)}>
-                <Text style={styles.deleteText}>Delete</Text>
+                {/* <Text style={styles.deleteText}>Delete</Text> */}
+                <Icons name='delete' />
               </Pressable>
             </View>
           )}
@@ -60,7 +64,7 @@ const GalleryScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 0,
     backgroundColor: "#fff",
   },
   title: {
@@ -75,6 +79,11 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     marginBottom: 16,
+  },
+  previewImage:{
+    width: 86,
+    height: 86,
+    borderRadius: 8,
   },
   image: {
     width: "100%",
