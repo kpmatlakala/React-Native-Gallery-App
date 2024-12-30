@@ -16,7 +16,7 @@ const Layout = () => {
     >
       <Stack.Screen
         name="index" 
-        options={{title: "Gallery App", headerShown:false }}       
+        options={{title: "Gallaria", headerShown:false }}       
       />
       <Stack.Screen
         name="camera"       

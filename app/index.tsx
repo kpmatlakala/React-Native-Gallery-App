@@ -10,6 +10,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
+      
       <GalleryScreen />
 
       {/* <Pressable
@@ -39,9 +40,6 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
   },
   title: {
     fontSize: 24,

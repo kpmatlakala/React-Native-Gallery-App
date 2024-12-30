@@ -38,24 +38,89 @@ type IconProps = {
             break;
 
         case "play":
-            return <Icon name="play" size={30} color="white" />
+            return <Icon name="play" size={size} color={color} />
             break;
 
         case "stop":
-            return <Icon name="stop" size={30} color="white" />
+            return <Icon name="stop" size={size} color={color} />
             break;
 
         case "pause":
-            return <Icon name="pause" size={30} color="white" />
+            return <Icon name="pause" size={size} color={color} />
             break;
         
         case "rename":
-            return <Icon name="rename" size={30} color="white" />
+            return <Icon name="i-cursor" size={size} color={color} />
             break;
+
+        case "edit":
+            return <Icon name="pen" size={size} color={color} />
+            break;            
         
         case "delete":
-            return <Icon name="trash" size={30} color="white" />
+            return <Icon name="trash" size={size} color={color} />
             break;
+
+        case "bars":
+            return <Icon name="bars" size={size} color={color} />
+            break;
+
+        case "back":
+            return <Icon name="chevron-left" size={size} color={color} />
+            break;
+
+        case "code":
+            return <Icon name="code" size={size} color={color} />
+            break;
+
+        case "folder":
+            return <Icon name="folder" size={size} color={color} />
+            break;
+        
+        case "folder-open":
+            return <Icon name="folder-open" size={size} color={color} />
+            break;
+
+        case "image":
+            return <Icon name="image" size={size} color={color} />
+            break;
+        
+        case "images":
+            return <Icon name="images" size={size} color={color} />
+            break;
+
+        case "file-image":
+            return <Icon name="file-image" size={size} color={color} />
+            break;
+        
+        case "share":
+            return <Icon name="share" size={size} color={color} />
+            break;
+            
+        case "share-nodes":
+            return <Icon name="share-nodes" size={size} color={color} />
+            break;
+
+        case "location":
+            return <Icon name="location-dot" size={size} color={color} />
+            break;            
+         
+        case "heart":
+            return <Icon name="heart" size={size} color={color} />
+            break;
+
+        case "info":
+            return <Icon name="info" size={size} color={color} />
+            break;  
+
+        case "search":
+            return <Icon name="search" size={size} color={color} />
+            break;
+
+        case "v-dots":
+            return <Icon name="ellipsis-v" size={size} color={color} />
+            break;
+            
 
         default:
             return <Icon name="pageline" size={30} color="white" />
