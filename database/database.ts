@@ -51,12 +51,15 @@ export const insertImage = async (uri: string, latitude: number, longitude: numb
 
 // Get all images
 export const fetchAllImages = async () => {
-  try {
+  try 
+  {
     const db = await openDatabase('galleryApp.db');
     const rows = await db.getAllAsync('SELECT * FROM images');
-    console.log('Fetched images:', rows);
+    // console.log('Fetched images:', rows);
     return rows;
-  } catch (error) {
+  } 
+  catch (error) 
+  {
     console.error('Error fetching images:', error);
     throw error;
   }

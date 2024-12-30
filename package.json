@@ -31,7 +31,7 @@
     "expo-location": "~18.0.4",
     "expo-router": "~4.0.15",
     "expo-splash-screen": "~0.29.18",
-    "expo-sqlite": "~15.0.3",
+    "expo-sqlite": "~15.0.4",
     "expo-status-bar": "~2.0.0",
     "expo-symbols": "~0.2.0",
     "expo-system-ui": "~4.0.6",
@@ -39,6 +39,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.5",
+    "react-native-carousel-slider": "^0.0.4",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-get-random-values": "~1.11.0",
     "react-native-image-zoom-viewer": "^3.0.1",
@@ -50,7 +51,8 @@
     "react-native-sqlite-storage": "^6.0.1",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
-    "react-native-webview": "13.12.5"
+    "react-native-webview": "13.12.5",
+    "swiper": "^11.1.15"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

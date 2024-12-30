@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, Image, Pressable, Alert, Modal, ScrollView, Dimensions } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, StyleSheet, FlatList, Image, Pressable, Alert, Modal, Dimensions } from "react-native";
 import { fetchAllImages, deleteImageById } from "@/database/database";
 import Icons from "@/utils/Icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -9,7 +9,12 @@ const GalleryScreen = () => {
 
   const [images, setImages] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // Tracks the currently viewed image index
+  const [slide, setSlide] = useState(1); // Slide (1-based index) to display on the modal
+  const [prevDisabled, setPrevDisabled] = useState(false); // Disable prev button on first image
+  const [nextDisabled, setNextDisabled] = useState(false); // Disable next button on last image
+
+  const flatlistRef = useRef(null);
 
   // Function to load images from the database
   const loadImages = async () => {
@@ -28,7 +33,7 @@ const GalleryScreen = () => {
   }, []);
 
   // Function to delete an image by its id
-  const deleteImage = async (id: number) => {
+  const deleteImage = async (id) => {
     try {
       await deleteImageById(id);
       setImages((prevImages) => prevImages.filter((img) => img.id !== id));
@@ -40,20 +45,59 @@ const GalleryScreen = () => {
   };
 
   // Function to open the fullscreen image viewer
-  const openImageViewer = (index: number) => {
+  const openImageViewer = (index) => {
     setCurrentImageIndex(index);
+    setSlide(index + 1); // Update slide position (1-based index)
     setIsModalVisible(true);
+
+    // Ensure the FlatList scrolls to the selected image
+    if (flatlistRef.current) {
+      flatlistRef.current.scrollToIndex({ index, animated: true });
+    }
   };
 
-  // Function to handle swipe gestures and update the current image index
-  const handleSwipe = (direction: "left" | "right") => {
-    let newIndex = currentImageIndex;
-    if (direction === "left") {
-      newIndex = currentImageIndex === images.length - 1 ? 0 : currentImageIndex + 1;
-    } else {
-      newIndex = currentImageIndex === 0 ? images.length - 1 : currentImageIndex - 1;
-    }
+  // Handle next and previous slide navigation
+  const onPrevious = () => {
+    if (currentImageIndex === 0) return; // Do nothing if we're on the first image
+    const newIndex = currentImageIndex - 1;
     setCurrentImageIndex(newIndex);
+    setSlide(newIndex + 1); // Update slide position
+    flatlistRef.current.scrollToIndex({ index: newIndex, animated: true });
+  };
+
+  const onNext = () => {
+    if (currentImageIndex === images.length - 1) return; // Do nothing if we're on the last image
+    const newIndex = currentImageIndex + 1;
+    setCurrentImageIndex(newIndex);
+    setSlide(newIndex + 1); // Update slide position
+    flatlistRef.current.scrollToIndex({ index: newIndex, animated: true });
+  };
+
+  // Define the getItemLayout function for horizontal FlatList
+  const getItemLayout = (data, index) => ({
+    length: width,  // Each item has the same width as the screen
+    offset: width * index, // Offset based on the current index
+    index,  // The current index of the item
+  });
+
+  // Handle failed scrollToIndex attempts
+  const onScrollToIndexFailed = (error) => {
+    const contentOffsetX = error.averageItemLength * error.index;
+    flatlistRef.current.scrollToOffset({ offset: contentOffsetX, animated: true });
+  };
+
+  // Handle the scroll event to keep the image index synced
+  const onScroll = (e) => {
+    const offsetX = e.nativeEvent.contentOffset.x;
+    const newIndex = Math.floor(offsetX / width);
+
+    // Update the index and slide number
+    setCurrentImageIndex(newIndex);
+    setSlide(newIndex + 1);
+
+    // Disable buttons based on position
+    setPrevDisabled(newIndex === 0);
+    setNextDisabled(newIndex === images.length - 1);
   };
 
   // Render each item (image) in the FlatList
@@ -66,100 +110,110 @@ const GalleryScreen = () => {
   );
 
   return (
-    <View style={[styles.container, width]}>
-      <View  style={[styles.header, width]}>
+    <View style={styles.container}>
+      <View style={styles.header}>
         <Text style={styles.title}>
-          <Icons name="image" size={22}color="black"/> Galleria 
+          <Icons name="image" size={22} color="black" /> Galleria
         </Text>
 
         <View style={styles.topRightCornder}>
-          <Pressable >
-            <Icons name="camera" size={26} color="black"/>
+          <Pressable>
+            <Icons name="camera" size={26} color="black" />
           </Pressable>
 
           <Pressable>
-            <Icons name="search" size={26} color="black"/>
+            <Icons name="search" size={26} color="black" />
           </Pressable>
 
           <Pressable>
-            <Icons name="v-dots" size={26} color="black"/> 
-          </Pressable>         
+            <Icons name="v-dots" size={26} color="black" />
+          </Pressable>
         </View>
       </View>
 
-
-      {
-        images.length === 0 ? (
-          <Text style={styles.message}>No photos available.</Text>
-        ) : (
-          <FlatList
-            data={images}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderItem}
-            numColumns={4} // Display images in a 4-column grid
-            contentContainerStyle={styles.gridContainer} // Style for the FlatList content
-          />
-        )
-      }
-
       {/* Fullscreen Image Viewer Modal */}
-      <Modal visible={isModalVisible} transparent={true} animationType="fade" onRequestClose={() => setIsModalVisible(false)}>
+      <Modal visible={isModalVisible} transparent={true} animationType="fade" 
+         onRequestClose={() => {
+          setIsModalVisible(false);
+          setCurrentImageIndex(0); // Reset to the first image when the modal is closed
+          setSlide(1); // Reset the slide to 1 (1-based index)
+        }}
+      >
         <GestureHandlerRootView style={styles.modalContainer}>
-          {/* Image Slide Show */}
-          <ScrollView
-            horizontal
-            pagingEnabled
-            contentContainerStyle={styles.scrollViewContent}
-            showsHorizontalScrollIndicator={false}
-            contentOffset={{ x: currentImageIndex * 300, y: 0 }}  // Assuming image width is 300
-          >
-            {images.map((img, index) => (
-              <View key={index} style={[styles.imageSlide, { width }]}>
-                <Image source={{ uri: img.uri }} style={styles.fullscreenImage} />
-              </View>
-            ))}
-          </ScrollView>
+          {images && (
+            <FlatList
+              ref={flatlistRef}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={width}
+              snapToAlignment="center"
+              decelerationRate="fast"
+              pagingEnabled={true}
+              data={images}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <View style={{ width: width, height: height, justifyContent: "center", alignItems: "center" }}>
+                  <Image source={{ uri: item.uri }} style={{ width: "98%", height: height, resizeMode: "contain" }} />
+                </View>
+              )}
+              getItemLayout={getItemLayout}  // Provide the layout info for the FlatList
+              onScrollToIndexFailed={onScrollToIndexFailed}  // Handle failed scroll attempts
+              onScroll={onScroll}  // Handle scroll position updates
+              scrollEventThrottle={16}
+              initialScrollIndex={currentImageIndex} // Start at the correct index when modal opens
+            />
+          )}
 
           {/* Close Button */}
           <Pressable style={styles.closeButton} onPress={() => setIsModalVisible(false)}>
             <Icons name="back" size={30} color="white" />
           </Pressable>
 
-          {/* Image Metadata and Delete Button */}
-          <View style={[styles.overlay, { width }]}>
-             <Text style={styles.metadata}>
-              {console.log(images[currentImageIndex])}
-              {/* Latitude: {images[currentImageIndex].latitude}, Longitude: {images[currentImageIndex].longitude} */}
-            </Text> 
+          {/* Image Metadata and Controls */}
+          <View style={styles.overlay}>
+            <Text style={styles.metadata}>{images[currentImageIndex]?.id}</Text>
 
-              
-            {/* Swipe controls (Left & Right) */}
             <View style={styles.swipeControls}>
-              {/* <Pressable onPress={() => handleSwipe("right")} style={styles.swipeButton}>
-                <Text style={styles.swipeText}>{"<"}</Text>
-              </Pressable> */}
-              <Pressable style={styles.deleteButton} onPress={() => deleteImage(images[currentImageIndex].id)}>
+              <Pressable onPress={onPrevious} disabled={prevDisabled} style={({ pressed }) => [{ opacity: pressed || prevDisabled ? 0.5 : 1 }]}>
+                <Icons name="left-arrow" size={30} color="white" />
+              </Pressable>
+
+              <Pressable style={styles.deleteButton} onPress={() => alert("add to faves")}>
                 <Icons name="heart" size={25} color="white" />
               </Pressable>
 
-              <Pressable style={styles.deleteButton} onPress={() => deleteImage(images[currentImageIndex].id)}>
+              <Pressable style={styles.deleteButton} onPress={() => alert("edit the image")}>
                 <Icons name="rename" size={25} color="white" />
               </Pressable>
 
-              <Pressable style={styles.deleteButton} onPress={() => deleteImage(images[currentImageIndex].id)}>
+              <Pressable style={styles.deleteButton} onPress={() => alert("show image info")}>
                 <Icons name="info" size={25} color="white" />
               </Pressable>
-              
-              <Pressable style={styles.deleteButton} onPress={() => deleteImage(images[currentImageIndex].id)}>
+
+              <Pressable style={styles.deleteButton} onPress={() => deleteImage(images[currentImageIndex]?.id)}>
                 <Icons name="delete" size={25} color="white" />
               </Pressable>
-              {/* <Pressable onPress={() => handleSwipe("left")} style={styles.swipeButton}>
-                <Text style={styles.swipeText}>{">"}</Text>
-              </Pressable> */}
+
+              <Pressable onPress={onNext} disabled={nextDisabled} style={({ pressed }) => [{ opacity: pressed || nextDisabled ? 0.5 : 1 }]}>
+                <Icons name="right-arrow" size={30} color="white" />
+              </Pressable>
             </View>
           </View>
         </GestureHandlerRootView>
       </Modal>
+
+      {/* Gallery Grid */}
+      {images.length === 0 ? (
+        <Text style={styles.message}>No photos available.</Text>
+      ) : (
+        <FlatList
+          data={images}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          numColumns={4}
+          contentContainerStyle={styles.gridContainer}
+        />
+      )}
     </View>
   );
 };
@@ -170,22 +224,22 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#fff",
   },
-  header:{
-    flexDirection:"row",
-    justifyContent:"space-between",
-    paddingRight:16,
-    marginTop:8, 
-    marginBottom:16
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingRight: 16,
+    marginTop: 8,
+    marginBottom: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
   },
-  topRightCornder:{
+  topRightCornder: {
     width: "51%",
-    flexDirection:"row",
-    justifyContent:"space-between",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   message: {
     textAlign: "center",
@@ -194,50 +248,28 @@ const styles = StyleSheet.create({
   },
   gridContainer: {
     flexGrow: 1,
-    paddingBottom: 10, // Padding for the bottom of the list
+    paddingBottom: 10,
   },
   itemContainer: {
-    width: "23%", // Ensure there is space for 4 items per row (with a little margin)
+    width: "23%",
     marginBottom: 16,
-    marginRight: 8, // Add margin-right for spacing between columns
+    marginRight: 8,
   },
   image: {
-    width: "100%", // Make the image take up the full width of the item container
-    aspectRatio: 1, // Maintain a square aspect ratio for the images
+    width: "100%",
+    aspectRatio: 1,
     borderRadius: 8,
   },
   modalContainer: {
     position: "absolute",
-    top:0,
+    top: 0,
     bottom: 0,
     left: 0,
     right: 0,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(20, 20, 20, 0.98)", // Background overlay
-    padding: 0,
-  },
-  scrollViewContent: 
-  {
-    flexDirection: "row", 
-    alignSelf:"center",
-  },
-  imageSlide: {
-    borderColor:"rgba(255, 255, 255, 0.8)",
-    borderWidth: 1,
-    width: "100svw", // Image width for sliding
-    // height: 300, // Image height
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 0, // Ensure the image is horizontally centered within the container
-    flex: 1, // Ensure that imageSlide takes up all available space
-  },
-  fullscreenImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 8,
-    resizeMode: "contain", // Ensure image aspect ratio is preserved
+    backgroundColor: "rgba(20, 20, 20, 0.98)",
   },
   overlay: {
     position: "absolute",
@@ -246,8 +278,7 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20
-    // width: "100%",
+    paddingHorizontal: 20,
   },
   metadata: {
     fontSize: 18,
@@ -257,7 +288,7 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 12,
-    backgroundColor: "#f44336", // Red background for the delete button
+    backgroundColor: "#f44336",
     borderRadius: 8,
     marginBottom: 20,
   },
@@ -265,15 +296,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-  },
-  swipeButton: {
-    padding: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    borderRadius: 20,
-  },
-  swipeText: {
-    color: "#fff",
-    fontSize: 20,
   },
   closeButton: {
     position: "absolute",

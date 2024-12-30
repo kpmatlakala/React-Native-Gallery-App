@@ -65,12 +65,20 @@ type IconProps = {
             return <Icon name="bars" size={size} color={color} />
             break;
 
-        case "back":
-            return <Icon name="chevron-left" size={size} color={color} />
+        case "left-arrow":
+            return <Icon name="caret-left" size={size} color={color} />
+            break;
+
+        case "right-arrow":
+            return <Icon name="caret-right" size={size} color={color} />
             break;
 
         case "code":
             return <Icon name="code" size={size} color={color} />
+            break;
+
+        case "back":
+            return <Icon name="chevron-left" size={size} color={color} />
             break;
 
         case "folder":
@@ -123,7 +131,7 @@ type IconProps = {
             
 
         default:
-            return <Icon name="pageline" size={30} color="white" />
+            return <Icon name="bullseye" size={30} color="white" />
             break;
         }
 }
