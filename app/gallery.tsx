@@ -1,11 +1,16 @@
+import Icons from "@/utils/Icons";
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, FlatList, Image, Pressable, Alert, Modal, Dimensions } from "react-native";
-import { fetchAllImages, deleteImageById } from "@/database/database";
-import Icons from "@/utils/Icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+import CameraScreen from "./camera";
+import { fetchAllImages, deleteImageById } from "@/database/database";
+
+
 
 const GalleryScreen = () => {
   const { width, height } = Dimensions.get("window");
+  const [isCameraVisible, setIsCameraVisible] = useState(false);
 
   const [images, setImages] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -31,6 +36,15 @@ const GalleryScreen = () => {
   useEffect(() => {
     loadImages();
   }, []);
+
+  const toggleCameraModal = () => {
+    setIsCameraVisible((prev) => !prev);
+    if(isCameraVisible) refreshImages();
+  };
+  // Refresh images after taking a photo
+  const refreshImages = () => {
+    loadImages();  // Reload the images from the database
+  };
 
   // Function to delete an image by its id
   const deleteImage = async (id) => {
@@ -117,7 +131,7 @@ const GalleryScreen = () => {
         </Text>
 
         <View style={styles.topRightCornder}>
-          <Pressable>
+          <Pressable onPress={toggleCameraModal}>
             <Icons name="camera" size={26} color="black" />
           </Pressable>
 
@@ -130,6 +144,10 @@ const GalleryScreen = () => {
           </Pressable>
         </View>
       </View>
+
+      <Modal visible={isCameraVisible} transparent={true} animationType="slide" onRequestClose={toggleCameraModal}>
+        <CameraScreen onClose={toggleCameraModal} onImageCaptured={refreshImages} />
+      </Modal>
 
       {/* Fullscreen Image Viewer Modal */}
       <Modal visible={isModalVisible} transparent={true} animationType="fade" 
@@ -279,18 +297,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,
+    gap: 4,
   },
   metadata: {
     fontSize: 18,
     color: "#fff",
     textAlign: "center",
     marginBottom: 16,
+    gap: 4,
   },
   deleteButton: {
+    width:64,
     padding: 12,
-    backgroundColor: "#f44336",
+    marginHorizontal: 0,
+    // backgroundColor: "#f44336",
+    borderColor: "grey",
+    borderWidth:1,
     borderRadius: 8,
     marginBottom: 20,
+    flex: 1,
+ 
+    alignItems:"center"
   },
   swipeControls: {
     flexDirection: "row",

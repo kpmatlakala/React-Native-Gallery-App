@@ -1,7 +1,7 @@
 
 import React from "react";
 import type { PropsWithChildren } from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/FontAwesome5";
 
 // Define IconProps using `type` with optional `size`
 type IconProps = {
@@ -30,7 +30,7 @@ type IconProps = {
             break;
 
         case "camera-rotate":
-            return <Icon name="camera-rotate" size={size} color={color} />
+            return <Icon name="sync-alt" size={size} color={color} />
             break;
 
         case "microphone":
