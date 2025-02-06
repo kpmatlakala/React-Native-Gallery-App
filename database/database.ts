@@ -1,9 +1,18 @@
+// database.ts
 import * as SQLite from 'expo-sqlite';
+
+// Store the database instance globally to reuse it
+let dbInstance: SQLite.SQLiteDatabase  | null = null;
 
 // Open the database
 const openDatabase = async (databaseName: string) => {
+  if (dbInstance) {
+    return dbInstance;  // Return the existing database instance if already opened
+  }
+
   const db = await SQLite.openDatabaseAsync(databaseName);
-  console.log(`Database ${databaseName} opened.`);
+  console.log(`Database: ${databaseName} opened.`);
+  dbInstance = db;  // Store the database instance
   return db;
 };
 
@@ -11,8 +20,9 @@ const openDatabase = async (databaseName: string) => {
 export const initializeDatabase = async () => {
   try {
     const db = await openDatabase('galleryApp.db');
+    console.log("Attempting to initialize DB");
 
-    // Create table and insert initial data
+    // Create table if it doesn't exist
     await db.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS images (
@@ -25,7 +35,6 @@ export const initializeDatabase = async () => {
     `);
 
     console.log('Database initialized successfully.');
-    return db;
   } catch (error) {
     console.error('Error initializing the database:', error);
     throw error;
@@ -55,7 +64,7 @@ export const fetchAllImages = async () => {
   {
     const db = await openDatabase('galleryApp.db');
     const rows = await db.getAllAsync('SELECT * FROM images');
-    // console.log('Fetched images:', rows);
+    console.log('Fetched images:', rows);
     return rows;
   } 
   catch (error) 

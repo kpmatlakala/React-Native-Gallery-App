@@ -23,10 +23,13 @@ const GalleryScreen = () => {
 
   // Function to load images from the database
   const loadImages = async () => {
-    try {
+    try 
+    {
       const fetchedImages = await fetchAllImages();
       setImages(fetchedImages);
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       console.error("Error fetching images:", error);
       Alert.alert("Error", "Failed to load gallery images.");
     }
@@ -48,11 +51,14 @@ const GalleryScreen = () => {
 
   // Function to delete an image by its id
   const deleteImage = async (id) => {
-    try {
+    try 
+    {
       await deleteImageById(id);
       setImages((prevImages) => prevImages.filter((img) => img.id !== id));
       Alert.alert("Success", "Image deleted successfully.");
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       console.error("Error deleting image:", error);
       Alert.alert("Error", "Failed to delete the image.");
     }

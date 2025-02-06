@@ -38,8 +38,7 @@
         {
           "enableFTS": true,
           "useSQLCipher": true,
-          "android": {
-            
+          "android": {            
             "enableFTS": false,
             "useSQLCipher": false
           },
@@ -51,8 +50,8 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(react-native-lesson-5-gallery-app) to access your camera",
-          "microphonePermission": "Allow $(react-native-lesson-5-gallery-app) to access your microphone",
+          "cameraPermission": "Allow react-native-lesson-5-gallery-app to access your camera",
+          "microphonePermission": "Allow react-native-lesson-5-gallery-app to access your microphone",
           "recordAudioAndroid": true
         }
       ]

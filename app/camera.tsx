@@ -34,11 +34,13 @@ const CameraScreen = ({ onClose, onImageCaptured }: CameraScreenProps) => {
     return <View />;
   }
 
-  if (!permission.granted) {
+  if (!permission.granted) 
+  {
     return (
-      <View style={styles.container}>
+      <View style={styles.permission_container}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Pressable onPress={requestPermission}>
+        
+        <Pressable style={{ padding: 32, backgroundColor: "lightgrey" }} onPress={requestPermission}>
           <Text>Grant Permission</Text>
         </Pressable>
       </View>
@@ -59,6 +61,7 @@ const CameraScreen = ({ onClose, onImageCaptured }: CameraScreenProps) => {
         {
           await insertImage(photo.uri, location.coords.latitude, location.coords.longitude);
         }
+
         onImageCaptured(); // Refresh images in GalleryScreen
         // onClose(); // Close the camera modal after taking the picture
       } 
@@ -95,6 +98,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+  },
+  permission_container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16
   },
   camera: {
     flex: 1,
