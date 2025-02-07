@@ -4,8 +4,9 @@ import { View, Text, StyleSheet, FlatList, Image, Pressable, Alert, Modal, Dimen
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import CameraScreen from "./camera";
-import { fetchAllImages, deleteImageById } from "@/database/database";
+import { fetchAllImages, deleteImageById, deleteDatabaseFile, updateTableSchema } from "@/database/database";
 import ImageInfoModal from "@/components/ImageInfoModal";
+import { router } from "expo-router";
 
 
 
@@ -149,7 +150,14 @@ const GalleryScreen = () => {
             <Icons name="search" size={26} color="black" />
           </Pressable>
 
-          <Pressable>
+          <Pressable onPress={()=> {
+              // deleteImage("images")
+              // deleteDatabaseFile();
+              // updateTableSchema()
+              console.log("pressed");
+              
+              router.replace("/map")
+            }}>
             <Icons name="v-dots" size={26} color="black" />
           </Pressable>
         </View>
@@ -199,7 +207,7 @@ const GalleryScreen = () => {
 
           {/* Image Metadata and Controls */}
           <View style={styles.overlay}>
-            <Text style={styles.metadata}>{images[currentImageIndex]?.id}</Text>
+            <Text style={styles.metadata}>{images[currentImageIndex]?.name}</Text>
 
             <View style={styles.swipeControls}>
               <Pressable onPress={onPrevious} disabled={prevDisabled} 
@@ -330,7 +338,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   metadata: {
-    fontSize: 18,
+    fontSize: 14,
     color: "#fff",
     textAlign: "center",
     marginBottom: 16,

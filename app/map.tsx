@@ -27,8 +27,11 @@ export default function Map() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:"grey"
   },
   map: {
     flex: 1,
+    backgroundColor:"grey"
+
   },
 });

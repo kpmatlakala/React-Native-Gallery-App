@@ -1,5 +1,8 @@
 // database.ts
 import * as SQLite from 'expo-sqlite';
+import * as FileSystem from 'expo-file-system';
+import { format } from 'date-fns';
+
 
 // Store the database instance globally to reuse it
 let dbInstance: SQLite.SQLiteDatabase  | null = null;
@@ -21,7 +24,7 @@ const openDatabase = async (databaseName: string) => {
 export const initializeDatabase = async () => {
   try {
     const db = await openDatabase('galleryApp.db');
-    console.log("Attempting to initialize DB");
+    console.log("Attempting to initialize DB");   
 
     // Create table if it doesn't exist
     await db.execAsync(`
@@ -30,7 +33,10 @@ export const initializeDatabase = async () => {
         id INTEGER PRIMARY KEY NOT NULL,
         uri TEXT NOT NULL,
         latitude REAL NOT NULL,
-        longitude REAL NOT NULL,
+        longitude REAL NOT NULL,        
+        name TEXT NOT NULL,
+        tag TEXT,
+        album TEXT,
         timestamp TEXT DEFAULT CURRENT_TIMESTAMP
       );
     `);
@@ -43,17 +49,27 @@ export const initializeDatabase = async () => {
 };
 
 // Insert an image record
-export const insertImage = async (uri: string, latitude: number, longitude: number) => {
-  try {
+export const insertImage = async (uri: string, latitude: number, longitude: number, tag: string, album: string) => {
+  try 
+  {
+    const timestamp = new Date().getTime(); // Get current timestamp in milliseconds
+    const formattedDate = format(new Date(), 'MMddyyyy_HHmmss'); // Format the timestamp
+    const imageName = `Galleria_Img_${formattedDate}`; //react-native-lesson-5-img / Galleria_img
+
     const db = await openDatabase('galleryApp.db');
     const result = await db.runAsync(
-      'INSERT INTO images (uri, latitude, longitude) VALUES (?, ?, ?)',
+      'INSERT INTO images (uri, latitude, longitude, name, tags, album) VALUES (?, ?, ?, ?, ?, ?)',
       uri,
       latitude,
-      longitude
+      longitude,
+      imageName,
+      tag,
+      album
     );
     console.log(`Image inserted with ID: ${result.lastInsertRowId}`);
-  } catch (error) {
+  } 
+  catch (error) 
+  {
     console.error('Error inserting image:', error);
     throw error;
   }
@@ -100,6 +116,23 @@ export const fetchFirstImage = async () => {
   }
 };
 
+// Fetch images by album
+export const fetchImagesByAlbum = async (album: string) => {
+  try 
+  {
+    const db = await openDatabase('galleryApp.db');
+    const rows = await db.getAllAsync('SELECT * FROM images WHERE album = ?', album);
+    
+    console.log('Fetched images by album:', rows);
+    return rows;
+  } 
+  catch (error) 
+  {
+    console.error('Error fetching images by album:', error);
+    throw error;
+  }
+};
+
 // Update image record
 export const updateImageUri = async (id: number, newUri: string) => {
   try {
@@ -108,6 +141,59 @@ export const updateImageUri = async (id: number, newUri: string) => {
     console.log(`Image with ID: ${id} updated to new URI: ${newUri}`);
   } catch (error) {
     console.error('Error updating image URI:', error);
+    throw error;
+  }
+};
+
+
+export const updateTableSchema = async () => {
+  try {
+    const db = await openDatabase('galleryApp.db');
+    // Add the 'name' column to the 'images' table
+    await db.runAsync(`
+      ALTER TABLE images
+      ADD COLUMN name TEXT;
+    `);
+
+    await db.runAsync(`
+      ALTER TABLE images
+      ADD COLUMN tags TEXT;
+    `);
+    
+    await db.runAsync(`
+      ALTER TABLE images
+      ADD COLUMN album TEXT;
+    `);
+
+    console.log('Added "name", "tags", and "album" columns to images table');
+  } 
+  catch (error) 
+  {
+    console.error('Error updating table schema:', error);
+    throw error;
+  }
+};
+
+
+export const dropTable = async (tableName: string) => {
+  try {
+    const db = await openDatabase('galleryApp.db');
+    await db.runAsync(`DROP TABLE IF EXISTS ${tableName}`);
+    console.log(`Table ${tableName} dropped successfully.`);
+  } catch (error) {
+    console.error(`Error dropping table ${tableName}:`, error);
+    throw error;
+  }
+};
+
+
+export const deleteDatabaseFile = async () => {
+  try {
+    const dbFilePath = `${FileSystem.documentDirectory}sqlite/galleryApp.db`; // Path to the SQLite database
+    await FileSystem.deleteAsync(dbFilePath);
+    console.log('Database file deleted successfully.');
+  } catch (error) {
+    console.error('Error deleting database file:', error);
     throw error;
   }
 };

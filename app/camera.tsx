@@ -20,7 +20,8 @@ const CameraScreen = ({ onClose, onImageCaptured }: CameraScreenProps) => {
   useEffect(() => {
     const getLocationPermissions = async () => {
       const locationStatus = await Location.requestForegroundPermissionsAsync();
-      if (locationStatus.status === 'granted') {
+      if (locationStatus.status === 'granted') 
+      {
         const loc = await Location.getCurrentPositionAsync({});
         setLocation(loc);
       }
@@ -29,9 +30,7 @@ const CameraScreen = ({ onClose, onImageCaptured }: CameraScreenProps) => {
     getLocationPermissions();
   }, []);
 
-  if (!permission) {
-    return <View />;
-  }
+  if (!permission) { return <View />; }
 
   if (!permission.granted) {
     return (
@@ -54,10 +53,13 @@ const CameraScreen = ({ onClose, onImageCaptured }: CameraScreenProps) => {
     const fileName = uri.split('/').pop();  // Get the image file name from URI
     const permanentUri = `${FileSystem.documentDirectory}${fileName}`;  // New path in document directory
 
-    try {
+    try 
+    {
       await FileSystem.moveAsync({ from: uri, to: permanentUri });
       return permanentUri;  // Return the new URI after moving
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       console.error('Error moving file:', error);
       return uri;  // If something goes wrong, return original URI
     }
@@ -68,12 +70,16 @@ const CameraScreen = ({ onClose, onImageCaptured }: CameraScreenProps) => {
       try {
         const photo = await cameraRef.current.takePictureAsync();
         
-        if (location) {
+        if (location) 
+        {
+          const tag = ""; 
+          const album = 'Camera';    
+          
           // Move image to a permanent location
           const permanentUri = await moveImageToPermanentLocation(photo.uri);
 
           // Insert the image into the database with permanent URI
-          await insertImage(permanentUri, location.coords.latitude, location.coords.longitude);
+          await insertImage(permanentUri, location.coords.latitude, location.coords.longitude, tag, album);
 
           // Notify the gallery to refresh
           onImageCaptured();
