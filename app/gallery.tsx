@@ -5,6 +5,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import CameraScreen from "./camera";
 import { fetchAllImages, deleteImageById } from "@/database/database";
+import ImageInfoModal from "@/components/ImageInfoModal";
 
 
 
@@ -14,6 +15,7 @@ const GalleryScreen = () => {
 
   const [images, setImages] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isImageInfoVisible, setIsImageInfoVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0); // Tracks the currently viewed image index
   const [slide, setSlide] = useState(1); // Slide (1-based index) to display on the modal
   const [prevDisabled, setPrevDisabled] = useState(false); // Disable prev button on first image
@@ -120,6 +122,8 @@ const GalleryScreen = () => {
     setNextDisabled(newIndex === images.length - 1);
   };
 
+
+
   // Render each item (image) in the FlatList
   const renderItem = ({ item, index }) => (
     <View style={styles.itemContainer}>
@@ -198,31 +202,51 @@ const GalleryScreen = () => {
             <Text style={styles.metadata}>{images[currentImageIndex]?.id}</Text>
 
             <View style={styles.swipeControls}>
-              <Pressable onPress={onPrevious} disabled={prevDisabled} style={({ pressed }) => [{ opacity: pressed || prevDisabled ? 0.5 : 1 }]}>
+              <Pressable onPress={onPrevious} disabled={prevDisabled} 
+                style={({ pressed }) => [{ opacity: pressed || prevDisabled ? 0.5 : 1 }]}>
                 <Icons name="left-arrow" size={30} color="white" />
               </Pressable>
 
-              <Pressable style={styles.deleteButton} onPress={() => alert("add to faves")}>
+              <Pressable style={styles.favButton} onPress={() => alert("add to faves")}>
                 <Icons name="heart" size={25} color="white" />
               </Pressable>
 
-              <Pressable style={styles.deleteButton} onPress={() => alert("edit the image")}>
+              <Pressable style={styles.midButton} onPress={() => alert("edit the image")}>
                 <Icons name="rename" size={25} color="white" />
               </Pressable>
 
-              <Pressable style={styles.deleteButton} onPress={() => alert("show image info")}>
+              <Pressable style={styles.midButton} 
+                onPress={() => { 
+                  // alert("show image info")
+                  // showImageInfo(images[currentImageIndex])
+                  setIsImageInfoVisible(true);
+                }}
+              >
                 <Icons name="info" size={25} color="white" />
               </Pressable>
 
-              <Pressable style={styles.deleteButton} onPress={() => deleteImage(images[currentImageIndex]?.id)}>
+              <Pressable style={styles.deleteButton} 
+                onPress={() => deleteImage(images[currentImageIndex]?.id)}
+              >
                 <Icons name="delete" size={25} color="white" />
               </Pressable>
 
-              <Pressable onPress={onNext} disabled={nextDisabled} style={({ pressed }) => [{ opacity: pressed || nextDisabled ? 0.5 : 1 }]}>
+              <Pressable 
+                onPress={onNext} 
+                disabled={nextDisabled} 
+                style={({ pressed }) => [{ opacity: pressed || nextDisabled ? 0.5 : 1 }]}
+              >
                 <Icons name="right-arrow" size={30} color="white" />
               </Pressable>
             </View>
           </View>
+
+          <ImageInfoModal 
+            visible={isImageInfoVisible}
+            onClose={() => setIsImageInfoVisible(false)}
+            image={images[currentImageIndex]}
+          />
+
         </GestureHandlerRootView>
       </Modal>
 
@@ -293,17 +317,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(20, 20, 20, 0.98)",
+    backgroundColor: "rgba(20, 20, 20, 0.99)",
   },
   overlay: {
     position: "absolute",
-    bottom: 40,
+    bottom: 0,
     left: 0,
     right: 0,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,
-    gap: 4,
+    gap: 8,
   },
   metadata: {
     fontSize: 18,
@@ -312,14 +336,40 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     gap: 4,
   },
+  favButton: {
+    width:64,
+    padding: 12,
+    marginHorizontal: 0,
+    // backgroundColor: "#f44336",
+    // borderColor: "grey",
+    borderWidth:1,
+    borderRadius: 8,
+    marginLeft: 24,
+    marginBottom: 20,
+    flex: 1, 
+    alignItems:"center"
+  },
+  midButton: {
+    width:64,
+    padding: 12,
+    marginHorizontal: 0,
+    // backgroundColor: "#f44336",
+    // borderColor: "grey",
+    borderWidth:1,
+    borderRadius: 8,
+    marginBottom: 20,
+    flex: 1, 
+    alignItems:"center"
+  },
   deleteButton: {
     width:64,
     padding: 12,
     marginHorizontal: 0,
     // backgroundColor: "#f44336",
-    borderColor: "grey",
+    // borderColor: "grey",
     borderWidth:1,
     borderRadius: 8,
+    marginRight: 24,
     marginBottom: 20,
     flex: 1,
  
@@ -328,15 +378,18 @@ const styles = StyleSheet.create({
   swipeControls: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems:"baseline",
     width: "100%",
+    gap:8
   },
   closeButton: {
     position: "absolute",
     top: 20,
     left: 20,
     padding: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    borderRadius: 20,
+    width:48,
+    // backgroundColor: "rgba(0, 0, 0, 0.6)",
+    borderRadius: 50,
   },
 });
 

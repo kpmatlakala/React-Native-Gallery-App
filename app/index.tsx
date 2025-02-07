@@ -2,7 +2,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import GalleryScreen from "./gallery";
-import { initializeDatabase } from "@/database/database";
+import { fetchFirstImage, initializeDatabase } from "@/database/database";
 
 export default function Home() {
 
@@ -12,7 +12,9 @@ export default function Home() {
       {
         await initializeDatabase();  // Initialize DB on app load
         console.log('Database is ready!');
-      } catch (error) {
+      } 
+      catch (error) 
+      {
         console.error('Error setting up the database:', error);
       }
     };

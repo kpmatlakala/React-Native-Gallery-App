@@ -1,11 +1,10 @@
-// CameraScreen.tsx
-import Icons from "@/utils/Icons";
-
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
+import * as FileSystem from 'expo-file-system'; // For handling file system
 import { insertImage } from '@/database/database';
+import Icons from "@/utils/Icons";
 
 interface CameraScreenProps {
   onClose: () => void;
@@ -34,8 +33,7 @@ const CameraScreen = ({ onClose, onImageCaptured }: CameraScreenProps) => {
     return <View />;
   }
 
-  if (!permission.granted) 
-  {
+  if (!permission.granted) {
     return (
       <View style={styles.permission_container}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
@@ -51,21 +49,38 @@ const CameraScreen = ({ onClose, onImageCaptured }: CameraScreenProps) => {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
   };
 
-  const capturePhoto = async () => {
-    if (cameraRef.current)
-    {
-      try 
-      {
-        const photo = await cameraRef.current.takePictureAsync();
-        if (location) 
-        {
-          await insertImage(photo.uri, location.coords.latitude, location.coords.longitude);
-        }
+  // Move the captured image to permanent storage
+  const moveImageToPermanentLocation = async (uri: string) => {
+    const fileName = uri.split('/').pop();  // Get the image file name from URI
+    const permanentUri = `${FileSystem.documentDirectory}${fileName}`;  // New path in document directory
 
-        onImageCaptured(); // Refresh images in GalleryScreen
-        // onClose(); // Close the camera modal after taking the picture
-      } 
-      catch (error) { console.error('Error capturing photo:', error); }
+    try {
+      await FileSystem.moveAsync({ from: uri, to: permanentUri });
+      return permanentUri;  // Return the new URI after moving
+    } catch (error) {
+      console.error('Error moving file:', error);
+      return uri;  // If something goes wrong, return original URI
+    }
+  };
+
+  const capturePhoto = async () => {
+    if (cameraRef.current) {
+      try {
+        const photo = await cameraRef.current.takePictureAsync();
+        
+        if (location) {
+          // Move image to a permanent location
+          const permanentUri = await moveImageToPermanentLocation(photo.uri);
+
+          // Insert the image into the database with permanent URI
+          await insertImage(permanentUri, location.coords.latitude, location.coords.longitude);
+
+          // Notify the gallery to refresh
+          onImageCaptured();
+        }
+      } catch (error) {
+        console.error('Error capturing photo:', error);
+      }
     }
   };
 
@@ -75,19 +90,15 @@ const CameraScreen = ({ onClose, onImageCaptured }: CameraScreenProps) => {
         <View style={styles.footerContainer}>
           <Pressable style={styles.button} onPress={onClose}>
             <Icons name="images" />
-            {/* <Text style={styles.text}>Cancel</Text> */}
           </Pressable>
 
           <Pressable style={styles.cameraButton} onPress={capturePhoto}>
-            {/* <Text style={styles.text}>Take Photo</Text> */}
             <Icons name="camera" />
           </Pressable>
 
           <Pressable style={styles.button} onPress={toggleCameraFacing}>
             <Icons name="camera-rotate" />
-            {/* <Text style={styles.text}>Flip Camera camera-rotate</Text> */}
           </Pressable>
-          
         </View>
       </CameraView>
     </View>
@@ -109,41 +120,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footerContainer: {
-    position:"absolute",
-    bottom:16,
-    left:0,
-    right:0,
-    width:"99%",
+    position: "absolute",
+    bottom: 16,
+    left: 0,
+    right: 0,
+    width: "99%",
     height: 86,
     flexDirection: 'row',
-    justifyContent:"space-evenly",
-    alignItems:"center",
+    justifyContent: "space-evenly",
+    alignItems: "center",
     backgroundColor: 'transparent',
     padding: 16,
-    
   },
   button: {
-    // flex: 1,
-  
     alignItems: 'center',
-    justifyContent:"center",
-    
+    justifyContent: "center",
     width: 64,
     height: 64,
-    backgroundColor:"grey",
-
+    backgroundColor: "grey",
     borderRadius: 64,
   },
   cameraButton: {
-    // flex: 1,
-  
     alignItems: 'center',
-    justifyContent:"center",
-    
+    justifyContent: "center",
     width: 86,
     height: 86,
-    backgroundColor:"grey",
-
+    backgroundColor: "grey",
     borderRadius: 64,
   },
   text: {

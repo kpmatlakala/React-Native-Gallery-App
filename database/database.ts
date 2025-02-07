@@ -6,7 +6,8 @@ let dbInstance: SQLite.SQLiteDatabase  | null = null;
 
 // Open the database
 const openDatabase = async (databaseName: string) => {
-  if (dbInstance) {
+  if (dbInstance) 
+  {
     return dbInstance;  // Return the existing database instance if already opened
   }
 
