@@ -1,26 +1,30 @@
 import React from "react";
 import MapView, { Marker } from "react-native-maps";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 
-export default function Map() {
-  const markers = [
-    // Replace with actual data from SQLite
-    { latitude: -31.78825, longitude: 18.3570000, title: "Photo 1" },
-  ];
+export default function Map(title, latitude, longitude) 
+{
+  const {width ,height} = useWindowDimensions();
+  console.log("mapview: ", latitude, longitude);
+  const marker = {
+    coordinate: {
+      latitude: latitude,
+      longitude: longitude,
+    },
+    title: title, // Using the title prop here
+  };
 
   return (
-    <View style={styles.container}>
-      <MapView style={styles.map} initialRegion={{
-        latitude: -31.78825,
-        longitude: 18.3570000,
+    // <View style={styles.container}>
+      <MapView style={{ width, height:300, }} initialRegion={{
+        latitude: latitude,
+        longitude: longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       }}>
-        {markers.map((marker, index) => (
-          <Marker key={index} coordinate={marker} title={marker.title} />
-        ))}
+        <Marker coordinate={marker} title={marker.title} />        
       </MapView>
-    </View>
+    // </View>
   );
 }
 
@@ -30,8 +34,9 @@ const styles = StyleSheet.create({
     backgroundColor:"grey"
   },
   map: {
-    flex: 1,
-    backgroundColor:"grey"
-
+    // flex: 1,
+    backgroundColor:"grey",
+    width:300,
+    height:400
   },
 });

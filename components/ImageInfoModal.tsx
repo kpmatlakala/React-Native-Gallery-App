@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; // You can use any icon library
 import Map from '@/app/map';
+import MapViewer from './ImageViewerModal';
 
 // ImageInfoModal component that will display the image's details
 const ImageInfoModal = ({ visible, onClose, image }) => {
@@ -17,18 +18,25 @@ const ImageInfoModal = ({ visible, onClose, image }) => {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <FontAwesome name="close" size={24} color="white" />
+              <FontAwesome name="close" size={24} color="white" />
             </TouchableOpacity>
 
             <Image source={{ uri: image.uri }} style={styles.image} />
             <Text style={styles.infoText}>{image.album} / {image.name} </Text>
-            <Text style={styles.infoText}>URI: {image.uri}</Text> 
-            
-            {/* <Text style={styles.infoText}>Latitude: {image.latitude}</Text>
-            <Text style={styles.infoText}>Longitude: {image.longitude}</Text> */}
+            <Text style={styles.infoText}>URI: {image.uri}</Text>             
+            <Text style={styles.infoText}>coords: {image.latitude}, {image.longitude}</Text>
             <Text style={styles.infoText}>{image.timestamp}</Text>
             <Text style={styles.infoText}>{image.tag}</Text>
-            <Map />
+
+            {
+              image && image.latitude && image.longitude &&
+              <MapViewer 
+                title={image.name}
+                latitude={image.latitude} 
+                longitude={image.longitude}
+              />
+            }
+            
         </View>
       </View>
     </Modal>
