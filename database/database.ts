@@ -58,7 +58,7 @@ export const insertImage = async (uri: string, latitude: number, longitude: numb
 
     const db = await openDatabase('galleryApp.db');
     const result = await db.runAsync(
-      'INSERT INTO images (uri, latitude, longitude, name, tags, album) VALUES (?, ?, ?, ?, ?, ?)',
+      'INSERT INTO images (uri, latitude, longitude, name, tag, album) VALUES (?, ?, ?, ?, ?, ?)',
       uri,
       latitude,
       longitude,
@@ -150,22 +150,22 @@ export const updateTableSchema = async () => {
   try {
     const db = await openDatabase('galleryApp.db');
     // Add the 'name' column to the 'images' table
-    await db.runAsync(`
-      ALTER TABLE images
-      ADD COLUMN name TEXT;
-    `);
+    // await db.runAsync(`
+    //   ALTER TABLE images
+    //   ADD COLUMN name TEXT;
+    // `);
 
     await db.runAsync(`
       ALTER TABLE images
-      ADD COLUMN tags TEXT;
+      ADD COLUMN tag TEXT;
     `);
     
-    await db.runAsync(`
-      ALTER TABLE images
-      ADD COLUMN album TEXT;
-    `);
+    // await db.runAsync(`
+    //   ALTER TABLE images
+    //   ADD COLUMN album TEXT;
+    // `);
 
-    console.log('Added "name", "tags", and "album" columns to images table');
+    console.log('Added "name", "tag", and "album" columns to images table');
   } 
   catch (error) 
   {

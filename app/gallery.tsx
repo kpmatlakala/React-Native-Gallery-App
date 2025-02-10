@@ -156,7 +156,7 @@ const GalleryScreen = () => {
               // updateTableSchema()
               console.log("pressed");
               
-              router.replace("/map")
+              // router.replace("/map")
             }}>
             <Icons name="v-dots" size={26} color="black" />
           </Pressable>
