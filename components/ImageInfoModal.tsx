@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; // You can use any icon library
 import Map from '@/app/map';
-import MapViewer from './ImageViewerModal';
+import MapViewer from './MapViewer';
+import Icons from '@/utils/Icons';
 
 // ImageInfoModal component that will display the image's details
 const ImageInfoModal = ({ visible, onClose, image }) => {
@@ -18,16 +19,17 @@ const ImageInfoModal = ({ visible, onClose, image }) => {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <FontAwesome name="close" size={24} color="white" />
+              <Icons name="close" size={24} color="white" />
             </TouchableOpacity>
 
             <Image source={{ uri: image.uri }} style={styles.image} />
             <Text style={styles.infoText}>{image.album} / {image.name} </Text>
             <Text style={styles.infoText}>URI: {image.uri}</Text>             
-            <Text style={styles.infoText}>coords: {image.latitude}, {image.longitude}</Text>
+            
             <Text style={styles.infoText}>{image.timestamp}</Text>
             <Text style={styles.infoText}>{image.tag}</Text>
-
+            <Text style={styles.infoText}>coords: {image.latitude}, {image.longitude}</Text>
+            
             {
               image && image.latitude && image.longitude &&
               <MapViewer 
@@ -76,6 +78,14 @@ const styles = StyleSheet.create({
       position: 'absolute',
       top: 10,
       right: 10,
+      width:32,
+      height:32,
+      justifyContent:"center",
+      alignItems:"center",
+      backgroundColor:"#333",
+      borderRadius:16,
+      // backgroundColor: "white",
+      zIndex: 99
     },
     
     

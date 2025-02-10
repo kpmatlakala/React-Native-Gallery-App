@@ -1,6 +1,6 @@
 import Icons from "@/utils/Icons";
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, FlatList, Image, Pressable, Alert, Modal, Dimensions } from "react-native";
+import { View, Text, StyleSheet, FlatList, Image, Pressable, TextInput, Alert, Modal, Dimensions } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import CameraScreen from "./camera";
@@ -23,6 +23,14 @@ const GalleryScreen = () => {
   const [nextDisabled, setNextDisabled] = useState(false); // Disable next button on last image
 
   const flatlistRef = useRef(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchInput, setShowSearchInput] = useState(false);
+  
+  // Filtered images based on the search query
+  const filteredImages = images.filter((image) => 
+    image.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Function to load images from the database
   const loadImages = async () => {
@@ -123,8 +131,6 @@ const GalleryScreen = () => {
     setNextDisabled(newIndex === images.length - 1);
   };
 
-
-
   // Render each item (image) in the FlatList
   const renderItem = ({ item, index }) => (
     <View style={styles.itemContainer}>
@@ -146,7 +152,7 @@ const GalleryScreen = () => {
             <Icons name="camera" size={26} color="black" />
           </Pressable>
 
-          <Pressable>
+          <Pressable onPress={()=> setShowSearchInput(true)} >
             <Icons name="search" size={26} color="black" />
           </Pressable>
 
@@ -162,6 +168,25 @@ const GalleryScreen = () => {
           </Pressable>
         </View>
       </View>
+    
+      {
+        showSearchInput &&
+        <View style={{ }}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search images..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}  // Update the search query
+          />
+
+          <Pressable onPress={()=> setShowSearchInput(false)} 
+            style={{}}>
+            <Icons name="close" size={24} color="black" />
+          </Pressable>
+        </View>
+      }     
+
+   
 
       <Modal visible={isCameraVisible} transparent={true} animationType="slide" onRequestClose={toggleCameraModal}>
         <CameraScreen onClose={toggleCameraModal} onImageCaptured={refreshImages} />
@@ -201,7 +226,8 @@ const GalleryScreen = () => {
           )}
 
           {/* Close Button */}
-          <Pressable style={styles.closeButton} onPress={() => setIsModalVisible(false)}>
+          <Pressable style={styles.closeButton} 
+            onPress={() => setShowSearchInput(false)}>
             <Icons name="back" size={30} color="white" />
           </Pressable>
 
@@ -285,7 +311,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingRight: 16,
     marginTop: 8,
-    marginBottom: 16,
+    marginBottom: 0,
   },
   title: {
     fontSize: 24,
@@ -297,6 +323,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  searchInput:{
+    width: "60%",
+    borderRadius:4,
+    borderColor:"#ccc",
+    borderWidth:1,
+    margin: 8,
+    marginBottom: 16,
+
+  },
+  // closeButton: 
+  // {
+  //   // position: 'absolute',
+  //   // top: 0,
+  //   // right: 0,
+  //   width:32,
+  //   height:32,
+  //   justifyContent:"center",
+  //   alignItems:"center",
+  //   backgroundColor:"black",
+  //   borderRadius:16,
+  //   // backgroundColor: "white",
+  
+  // },
   message: {
     textAlign: "center",
     fontSize: 16,

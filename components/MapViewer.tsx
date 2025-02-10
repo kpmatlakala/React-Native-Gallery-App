@@ -5,7 +5,7 @@ import { View, StyleSheet, useWindowDimensions } from "react-native";
 export default function MapViewer({title, latitude, longitude}) 
 {
   const {width ,height} = useWindowDimensions();
-  console.log("mapview: ", latitude, longitude);
+  console.log("mapview: ", latitude, longitude, " | ", title);
   const marker = {
     coordinate: {
       latitude: latitude,
@@ -22,7 +22,7 @@ export default function MapViewer({title, latitude, longitude})
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       }}>
-        <Marker coordinate={marker} title={marker.title} />        
+        <Marker coordinate={{ latitude, longitude }} title={marker.title} />        
       </MapView>
     // </View>
   );

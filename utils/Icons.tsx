@@ -1,7 +1,7 @@
 
 import React from "react";
 import type { PropsWithChildren } from "react";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon from "react-native-vector-icons/FontAwesome6";
 
 // Define IconProps using `type` with optional `size`
 type IconProps = {
@@ -60,6 +60,10 @@ type IconProps = {
         case "delete":
             return <Icon name="trash" size={size} color={color} />
             break;
+
+        case "close":
+            return <Icon name="xmark" size={size} color={color} />
+            break; 
 
         case "bars":
             return <Icon name="bars" size={size} color={color} />
@@ -122,11 +126,11 @@ type IconProps = {
             break;  
 
         case "search":
-            return <Icon name="search" size={size} color={color} />
+            return <Icon name="magnifying-glass" size={size} color={color} />
             break;
 
         case "v-dots":
-            return <Icon name="ellipsis-v" size={size} color={color} />
+            return <Icon name="ellipsis-vertical" size={size} color={color} />
             break;
             
 
