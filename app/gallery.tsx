@@ -171,7 +171,9 @@ const GalleryScreen = () => {
     
       {
         showSearchInput &&
-        <View style={{ }}>
+        <View style={{ flexDirection:"row", justifyContent:"flex-end", alignItems:"center"}}>
+          <Text> All </Text>
+          
           <TextInput
             style={styles.searchInput}
             placeholder="Search images..."
@@ -180,13 +182,11 @@ const GalleryScreen = () => {
           />
 
           <Pressable onPress={()=> setShowSearchInput(false)} 
-            style={{}}>
-            <Icons name="close" size={24} color="black" />
+            style={styles.closeInput}>
+            <Icons name="close" size={24} color="white" />
           </Pressable>
         </View>
-      }     
-
-   
+      }        
 
       <Modal visible={isCameraVisible} transparent={true} animationType="slide" onRequestClose={toggleCameraModal}>
         <CameraScreen onClose={toggleCameraModal} onImageCaptured={refreshImages} />
@@ -332,20 +332,20 @@ const styles = StyleSheet.create({
     marginBottom: 16,
 
   },
-  // closeButton: 
-  // {
-  //   // position: 'absolute',
-  //   // top: 0,
-  //   // right: 0,
-  //   width:32,
-  //   height:32,
-  //   justifyContent:"center",
-  //   alignItems:"center",
-  //   backgroundColor:"black",
-  //   borderRadius:16,
-  //   // backgroundColor: "white",
+  closeInput: 
+  {
+    position: 'absolute',
+    top: 14,
+    right: 12,
+    width:32,
+    height:32,
+    justifyContent:"center",
+    alignItems:"center",
+    backgroundColor:"black",
+    borderRadius:16,
+    // backgroundColor: "white",
   
-  // },
+  },
   message: {
     textAlign: "center",
     fontSize: 16,
