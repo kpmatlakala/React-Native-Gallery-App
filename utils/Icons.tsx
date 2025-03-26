@@ -105,11 +105,11 @@ type IconProps = {
             return <Icon name="file-image" size={size} color={color} />
             break;
         
-        case "share":
-            return <Icon name="share" size={size} color={color} />
-            break;
+        // case "share":
+        //     return <Icon name="share" size={size} color={color} />
+        //     break;
             
-        case "share-nodes":
+        case "share":
             return <Icon name="share-nodes" size={size} color={color} />
             break;
 
